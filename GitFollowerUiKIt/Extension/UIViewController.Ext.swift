@@ -9,7 +9,6 @@ import UIKit
 
 fileprivate var containerView : UIView!
 
-
 extension UIViewController {
     func pressGFAlertOnMainThread(title: String, message: String, buttuonTitle: String){
         DispatchQueue.main.async {

@@ -15,7 +15,7 @@ class FollowersCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configure()
+        configureCell()
     }
     
     func set(follower: Follower) {
@@ -27,12 +27,25 @@ class FollowersCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
-        addSubview(avatarImageView)
-        addSubview(usernameLabel)
+
+    
+    /// Private method to configure cell layout
+    private func configureCell() {
+        contentView.addSubview(avatarImageView)
+        contentView.addSubview(usernameLabel)
+        
+        avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+        usernameLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        avatarImageView.layer.cornerRadius = 10
+        avatarImageView.clipsToBounds = true
+        
+        usernameLabel.textAlignment = .center
+        usernameLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        usernameLabel.textColor = .label
+        usernameLabel.numberOfLines = 1
         
         let padding: CGFloat = 8
-        
         NSLayoutConstraint.activate([
             avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
@@ -45,6 +58,7 @@ class FollowersCollectionViewCell: UICollectionViewCell {
             usernameLabel.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
+
 }
 
 

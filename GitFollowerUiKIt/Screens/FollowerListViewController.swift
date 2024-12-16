@@ -133,12 +133,24 @@ extension FollowerListViewController : UICollectionViewDelegate {
     }
 }
 
+// MARK: - UISearchResultsUpdating
 extension FollowerListViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        print("updating")
+        guard let filter = searchController.searchBar.text, !filter.isEmpty else {
+            updateData()
+            return
+        }
+        
+        let filteredFollowers = followers.filter { $0.login.lowercased().contains(filter.lowercased()) }
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Follower>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(filteredFollowers)
+        DispatchQueue.main.async {
+            self.dataSource.apply(snapshot, animatingDifferences: true)
+        }
     }
-    
 }
+
 
 
 
