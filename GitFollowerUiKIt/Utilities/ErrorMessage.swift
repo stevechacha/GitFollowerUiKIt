@@ -14,8 +14,3 @@ enum GFError : String, Error{
     case invalidData = "The data received from the serer was invalid. Please try again"
 }
 
-//enum Result<Success, Failure: Error> {
-//    case success(Success)
-//    case failure(Failure)
-//}
-
