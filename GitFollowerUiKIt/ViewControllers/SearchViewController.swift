@@ -6,14 +6,16 @@
 //
 
 import UIKit
-import SwiftUI
 
 class SearchViewController: UIViewController {
     let logoImageView = UIImageView()
     let usernameTextField = GFTextField()
     let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
     
-    var isUsernameEntered: Bool { return !usernameTextField.text!.isEmpty }
+    var isUsernameEntered: Bool { 
+        guard let text = usernameTextField.text else { return false }
+        return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,12 +39,14 @@ class SearchViewController: UIViewController {
     
     @objc func pushFollowesListController (){
         guard isUsernameEntered  else {
-            pressGFAlertOnMainThread(title: "Empty Username", message: "Please enter a username. We need to know who yo look for ", buttuonTitle: "Ok")
+            pressGFAlertOnMainThread(title: "Empty Username", message: "Please enter a username. We need to know who to look for.", buttonTitle: "Ok")
             return
         }
+        guard let username = usernameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+        
         let followerControllerList = FollowerListViewController()
-        followerControllerList.username = usernameTextField.text
-        followerControllerList.title = usernameTextField.text
+        followerControllerList.username = username
+        followerControllerList.title = username
         
         navigationController?.pushViewController(followerControllerList, animated: true)
         
@@ -94,42 +98,6 @@ extension SearchViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         pushFollowesListController()
         return true
-    }
-}
-
-
-extension String {
-    var isValidEmail: Bool {
-        let emailRegEx = "^(?!\\.)([A-Z0-9a-z_%+-]?[\\.]?[A-Z0-9a-z_%+-])+@[A-Za-z0-9-]{1,20}(\\.[A-Za-z0-9]{1,15}){0,10}\\.[A-Za-z]{2,20}$"
-        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: self)
-   }
-    
-    var isValidatePassword: Bool {
-        let passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
-        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", passwordRegex)
-        return passwordPredicate.evaluate(with: self)
-    }
-
-}
-
-// Step 1: Create a UIViewControllerRepresentable to wrap the UIKit view controller
-struct SearchViewControllerRepresentable:UIViewControllerRepresentable{
-    func makeUIViewController(context: Context) ->SearchViewController{
-        return SearchViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: SearchViewController, context: Context) {
-        // Handle updates if needed
-    }
-}
-
-// Step 2: Add a SwiftUI Preview
-struct SearchViewController_Previews: PreviewProvider {
-    static var previews: some View {
-        SearchViewControllerRepresentable()
-            .edgesIgnoringSafeArea(.all) // Optional: Ignore safe area for full preview
-            .previewDisplayName("Search View Controller")
     }
 }
 

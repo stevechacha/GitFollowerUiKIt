@@ -15,7 +15,12 @@ class NetworkManager {
     private init() {}
     
     func getFollowers(for username: String,page: Int, completed: @escaping (Result<[Follower], GFError>)->Void){
-        let endPoint = baseUrl + "\(username)/followers?per_page = 100&page\(page)"
+        guard let encodedUsername = username.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            completed(.failure(.invalidUsername))
+            return
+        }
+        
+        let endPoint = baseUrl + "\(encodedUsername)/followers?per_page=100&page=\(page)"
         
         guard let url = URL(string: endPoint) else {
             completed(.failure(.invalidUsername))
@@ -29,7 +34,7 @@ class NetworkManager {
             }
             
             guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                completed(.failure(.invalidREsponse))
+                completed(.failure(.invalidResponse))
                 return
             }
             guard let data = data else {

@@ -25,7 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
     }
     
-    func createSearchNaigation()-> UINavigationController{
+    func createSearchNavigation()-> UINavigationController{
         let searchController = SearchViewController()
         searchController.title = "Search"
         searchController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 0)
@@ -36,7 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func createFavouriteNavController()-> UINavigationController{
         let favouriteController = FavouriteViewController()
-        favouriteController.title = "Faavourite"
+        favouriteController.title = "Favourites"
         favouriteController.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 1)
         
         return UINavigationController(rootViewController: favouriteController)
@@ -45,7 +45,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func createTabBar() -> UITabBarController {
         let tabBar = UITabBarController()
         UITabBar.appearance().tintColor = .systemGreen
-        tabBar.viewControllers = [createSearchNaigation(),createFavouriteNavController()]
+        tabBar.viewControllers = [createSearchNavigation(),createFavouriteNavController()]
         
         return tabBar
     }

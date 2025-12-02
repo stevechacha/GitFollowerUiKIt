@@ -11,7 +11,9 @@ class GFImageView: UIImageView {
     
     let cache =  NetworkManager.shared.cache
     
-    let placeholder = UIImage(named: "avatatar-placeholder")
+    let placeholder = UIImage(named: "avatar-placeholder")
+    
+    private var task: URLSessionDataTask?
 
     override init(frame: CGRect){
         super.init(frame: frame)
@@ -30,7 +32,9 @@ class GFImageView: UIImageView {
         
     }
     
-    func downloadImage(from  urlString: String){
+    func downloadImage(from urlString: String){
+        // Cancel previous task if exists
+        task?.cancel()
         
         let cacheKey = NSString(string: urlString)
         
@@ -38,21 +42,32 @@ class GFImageView: UIImageView {
             self.image = image
             return
         }
+        
+        // Reset to placeholder while loading
+        image = placeholder
+        
         guard let url = URL(string: urlString) else { return }
         
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data , response , error in
+        task = URLSession.shared.dataTask(with: url) { [weak self] data , response , error in
             guard let self = self else { return }
-            if error != nil {return}
-            guard let response = response as? HTTPURLResponse , response.statusCode == 200 else {return}
+            
+            if error != nil { return }
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { return }
             guard let data = data else { return }
             
             guard let image = UIImage(data: data) else { return }
             
-            cache.setObject(image, forKey: cacheKey)
+            self.cache.setObject(image, forKey: cacheKey)
             
-            DispatchQueue.main.async { self.image = image }
-            
+            DispatchQueue.main.async {
+                self.image = image
+            }
         }
-        task.resume()
+        task?.resume()
+    }
+    
+    func cancelDownload() {
+        task?.cancel()
+        task = nil
     }
 }

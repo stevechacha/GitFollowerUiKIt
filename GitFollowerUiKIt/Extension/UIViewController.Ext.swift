@@ -6,13 +6,23 @@
 //
 
 import UIKit
+import ObjectiveC
 
-fileprivate var containerView : UIView!
+private var containerViewKey: UInt8 = 0
 
 extension UIViewController {
-    func pressGFAlertOnMainThread(title: String, message: String, buttuonTitle: String){
+    private var containerView: UIView? {
+        get {
+            return objc_getAssociatedObject(self, &containerViewKey) as? UIView
+        }
+        set {
+            objc_setAssociatedObject(self, &containerViewKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    func pressGFAlertOnMainThread(title: String, message: String, buttonTitle: String){
         DispatchQueue.main.async {
-            let alertViewController = GFAlertViewController(alertTitle: title, message: message, buttonTitle: buttuonTitle)
+            let alertViewController = GFAlertViewController(alertTitle: title, message: message, buttonTitle: buttonTitle)
             alertViewController.modalPresentationStyle = .overFullScreen
             alertViewController.modalTransitionStyle = .crossDissolve
             self.present(alertViewController, animated: true)
@@ -20,15 +30,18 @@ extension UIViewController {
     }
     
     func shouldShowLoadingView(){
-        containerView = UIView(frame: view.bounds)
-        view.addSubview(containerView)
+        guard containerView == nil else { return }
         
-        containerView.backgroundColor = .systemBackground
-        containerView.alpha = 0
+        let loadingContainerView = UIView(frame: view.bounds)
+        containerView = loadingContainerView
+        view.addSubview(loadingContainerView)
         
-        UIView.animate(withDuration: 0.25) { containerView.alpha = 0.8 }
+        loadingContainerView.backgroundColor = .systemBackground
+        loadingContainerView.alpha = 0
+        
+        UIView.animate(withDuration: 0.25) { loadingContainerView.alpha = 0.8 }
         let activityIndicator = UIActivityIndicatorView(style: .large)
-        containerView.addSubview(activityIndicator)
+        loadingContainerView.addSubview(activityIndicator)
         
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         
@@ -42,8 +55,8 @@ extension UIViewController {
     
     func dismissLoading(){
         DispatchQueue.main.async {
-            containerView.removeFromSuperview()
-            containerView = nil
+            self.containerView?.removeFromSuperview()
+            self.containerView = nil
         }
        
     }

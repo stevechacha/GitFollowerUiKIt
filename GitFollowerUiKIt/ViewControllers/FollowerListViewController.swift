@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SwiftUI
 
 
 class FollowerListViewController: UIViewController {
@@ -24,12 +23,9 @@ class FollowerListViewController: UIViewController {
         super.viewDidLoad()
         configureViewController()
         configureCollectionView()
-        configureSearcch()
+        configureSearch()
         getFollowers(username: username, page: page)
         configureDataSource()
-        
-
-        
     }
     
     func configureViewController (){
@@ -38,7 +34,7 @@ class FollowerListViewController: UIViewController {
 
     }
     
-    func configureSearcch(){
+    func configureSearch(){
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
         searchController.searchBar.placeholder = "Search for a username"
@@ -80,14 +76,14 @@ class FollowerListViewController: UIViewController {
                 self.followers.append(contentsOf: followers)
                 
                 if self.followers.isEmpty {
-                    let message = "This User doesn't have follower. Go follow them"
+                    let message = "This user doesn't have any followers. Go follow them!"
                     DispatchQueue.main.async { self.showEmptyStateView(with: message, in: self.view)}
                     return
                 }
                 self.updateData()
             
             case .failure(let error):
-                self.pressGFAlertOnMainThread(title: "Bad Staff", message: error.rawValue ,buttuonTitle: "OK")
+                self.pressGFAlertOnMainThread(title: "Bad Stuff", message: error.rawValue, buttonTitle: "OK")
             }
         }
     }
