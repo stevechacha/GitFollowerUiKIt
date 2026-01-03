@@ -40,7 +40,11 @@ final class NetworkService: NetworkServiceProtocol {
             do {
                 let decoded = try decoder.decode(T.self, from: data)
                 return decoded
-            } catch {
+            } catch let decodingError {
+                print("Decoding error: \(decodingError)")
+                if let dataString = String(data: data, encoding: .utf8) {
+                    print("Response data: \(String(dataString.prefix(500)))")
+                }
                 throw AppError.invalidData
             }
         } catch let error as AppError {
