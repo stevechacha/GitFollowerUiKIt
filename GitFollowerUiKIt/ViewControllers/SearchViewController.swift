@@ -7,14 +7,22 @@
 
 import UIKit
 
-class SearchViewController: UIViewController {
-    let logoImageView = UIImageView()
-    let usernameTextField = GFTextField()
-    let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
+final class SearchViewController: UIViewController {
+    private let viewModel: SearchViewModel
     
-    var isUsernameEntered: Bool { 
-        guard let text = usernameTextField.text else { return false }
-        return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    private let logoImageView = UIImageView()
+    private let usernameTextField = GFTextField()
+    private let callToActionButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
+    
+    var onNavigateToFollowers: ((String) -> Void)?
+
+    init(viewModel: SearchViewModel = SearchViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
@@ -31,28 +39,26 @@ class SearchViewController: UIViewController {
         navigationController?.isNavigationBarHidden = true
     }
     
-    
-    func createDismissKeyboardTapGesture(){
+    private func createDismissKeyboardTapGesture() {
         let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tap)
     }
     
-    @objc func pushFollowesListController (){
-        guard isUsernameEntered  else {
-            pressGFAlertOnMainThread(title: "Empty Username", message: "Please enter a username. We need to know who to look for.", buttonTitle: "Ok")
+    @objc private func pushFollowesListController() {
+        guard viewModel.validateUsername(usernameTextField.text) else {
+            pressGFAlertOnMainThread(
+                title: "Empty Username",
+                message: "Please enter a username. We need to know who to look for.",
+                buttonTitle: "Ok"
+            )
             return
         }
-        guard let username = usernameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
         
-        let followerControllerList = FollowerListViewController()
-        followerControllerList.username = username
-        followerControllerList.title = username
-        
-        navigationController?.pushViewController(followerControllerList, animated: true)
-        
+        guard let username = viewModel.getValidatedUsername() else { return }
+        onNavigateToFollowers?(username)
     }
     
-    func configureLogoImageView() {
+    private func configureLogoImageView() {
         view.addSubview(logoImageView)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         logoImageView.image = UIImage(named: "gh-logo")
@@ -65,7 +71,7 @@ class SearchViewController: UIViewController {
         ])
     }
     
-    func configureTextField() {
+    private func configureTextField() {
         view.addSubview(usernameTextField)
         usernameTextField.delegate = self
         usernameTextField.translatesAutoresizingMaskIntoConstraints = false
@@ -78,7 +84,7 @@ class SearchViewController: UIViewController {
         ])
     }
     
-    func configureCallToActionButton() {
+    private func configureCallToActionButton() {
         view.addSubview(callToActionButton)
         callToActionButton.translatesAutoresizingMaskIntoConstraints = false
         callToActionButton.addTarget(self, action: #selector(pushFollowesListController), for: .touchUpInside)

@@ -26,11 +26,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func createSearchNavigation()-> UINavigationController{
-        let searchController = SearchViewController()
+        let viewModel = SearchViewModel()
+        let searchController = SearchViewController(viewModel: viewModel)
         searchController.title = "Search"
         searchController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 0)
         
-        return UINavigationController(rootViewController: searchController)
+        let navController = UINavigationController(rootViewController: searchController)
+        
+        searchController.onNavigateToFollowers = { [weak navController] (username: String) in
+            Task { @MainActor in
+                let viewModel = DependencyContainer.makeFollowerListViewModel()
+                let followerListVC = FollowerListViewController(viewModel: viewModel, username: username)
+                navController?.pushViewController(followerListVC, animated: true)
+            }
+        }
+        
+        return navController
     }
 
     
